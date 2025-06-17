@@ -5,18 +5,17 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# Track conversation state
 conversation_step = {}
 
 def bot_reply(user_id, user_message):
     step = conversation_step.get(user_id, 0)
 
     if step == 0:
-        reply = "Hello! 👋 Welcome to our Voice ChatBot."
+        reply = "Hello! 👋 Welcome to our Voice Interviewer."
         conversation_step[user_id] = 1
 
     elif step == 1:
-        reply = "I am your here to interact with you! 😊 Could you please tell me your name?"
+        reply = "I am an Your here to interact with you! 😊 Could you please tell me your name?"
         conversation_step[user_id] = 2
 
     elif step == 2:
@@ -57,7 +56,7 @@ def index():
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
-    user_id = "user1"  # Simplified user ID
+    user_id = "user1"
     user_message = data.get("message", "")
     reply = bot_reply(user_id, user_message)
     return jsonify({"reply": reply})
