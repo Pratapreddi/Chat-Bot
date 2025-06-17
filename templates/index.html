@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>🎙️ Voice ChatBot - Self Introduction</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background:rgb(37, 80, 100); }
+        .chat-box { border: 1px solid #ccc; background: grey; padding: 15px; max-height: 400px; overflow-y: auto; margin-bottom: 10px; }
+        .chat-entry { margin: 10px 0; }
+        button { padding: 12px 18px; font-size: 16px; cursor: pointer; background:rgb(255, 0, 0); color: black ; border: none; border-radius: 5px; }
+        button:hover { background:rgb(206, 62, 69); }
+    </style>
+</head>
+<body>
+    <center>
+    <h2>🎙️ Voice ChatBot - Self Introduction</h2>
+    <div class="chat-box" id="chat-box"></div>
+    <button onclick="startListening()">🎤 Start Speaking</button>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        let recognition;
+        let isRecognizing = false;
+
+        function addChatEntry(sender, message) {
+            const entry = document.createElement('div');
+            entry.className = 'chat-entry';
+            entry.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatBox.appendChild(entry);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function speak(text) {
+            const synth = window.speechSynthesis;
+            const utterance = new SpeechSynthesisUtterance(text);
+            synth.speak(utterance);
+        }
+
+        function sendToBot(message) {
+            addChatEntry('You', message);
+
+            fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                addChatEntry('Interviewer', data.reply);
+                speak(data.reply);
+            });
+        }
+
+        function startListening() {
+            if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+                alert('Sorry, your browser does not support speech recognition.');
+                return;
+            }
+
+            if (isRecognizing) {
+                console.log('Already recognizing...');
+                return;
+            }
+
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.start();
+            isRecognizing = true;
+            console.log('Speech recognition started');
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                sendToBot(transcript);
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                addChatEntry('Error', 'Speech recognition error: ' + event.error);
+            };
+
+            recognition.onend = function() {
+                console.log('Speech recognition ended');
+                isRecognizing = false;
+            };
+        }
+
+        window.onload = function() {
+            const msg = "Hello!.....👋 Welcome to Voice Interview.";
+            addChatEntry('Interviewer', msg);
+            speak(msg);
+        };
+    </script>
+</center>
+</body>
+</html>
