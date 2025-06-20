@@ -2,56 +2,120 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>🎙️ Voice ChatBot - Self Introduction</title>
+    <title>🎙️ Voice + Text ChatBot - With Image Background</title>
     <style>
         body { 
             font-family: Arial, sans-serif; 
-            padding: 20px; 
-            background:rgba(36, 25, 25, 0.82); 
+            margin: 0; 
+            padding: 0; 
             display: flex; 
-            justify-content: flex-end; 
+            height: 100vh; 
         }
-        .chat-container {
+
+        /* Left side with background image */
+        .left-panel {
+            flex: 1;
+            background: url('/static/chatbot.avif') no-repeat center center;
+            background-size: cover;
+        }
+
+        /* Right side with chatbot */
+        .right-panel {
             width: 400px;
-            border: 1px solid #ccc; 
-            background: white; 
-            padding: 20px; 
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(223, 17, 17, 0.94);
+            background: rgba(155, 169, 199, 0.74);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-shadow: -3px 0 5px rgba(0,0,0,0.1);
         }
+
+        .chat-container {
+            width: 100%;
+        }
+
         .chat-box { 
             border: 1px solid #eee; 
-            background:rgb(119, 19, 233); 
+            background: rgb(54, 140, 219); 
             padding: 15px; 
             max-height: 400px; 
             overflow-y: auto; 
-            margin-bottom: 15px;
+            margin-bottom: 15px; 
             border-radius: 5px;
         }
+
         .chat-entry { 
             margin: 10px 0; 
         }
-        button { 
-            padding: 12px 18px; 
+
+        /* Medium-sized speaking button */
+        .voice-button {
+           padding: 12px 18px; 
             font-size: 16px; 
             cursor: pointer; 
-            background:rgb(6, 185, 240); 
+            background:rgb(54, 140, 219);
+            color: black; 
+            border: none; 
+            border-radius: 5px;
+            margin-bottom: 20px; 
+        }
+
+        .voice-button:hover { 
+            background:rgb(40, 42, 168); 
+            color: white;
+        }
+
+        /* Input + Ask button below */
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .input-area button { 
+            padding: 10px 16px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            background:rgb(54, 140, 219); 
             color: black; 
             border: none; 
             border-radius: 5px; 
         }
-        button:hover { 
-            background:rgb(180, 243, 7); 
+
+        .input-area button:hover { 
+             background:rgb(40, 42, 168); 
+            color: white; 
         }
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <h2>🎙️ Voice ChatBot</h2>
-        <div class="chat-box" id="chat-box"></div>
-        <center>
-        <button onclick="startListening()">🎤 Start Speaking</button>
-        </center>
+    <!-- Left side with your uploaded image -->
+    <div class="left-panel"></div>
+
+    <!-- Right side with chatbot -->
+    <div class="right-panel">
+        <div class="chat-container">
+            <center>
+            <h2>Voice ChatBot</h2>
+            <div class="chat-box" id="chat-box"></div>
+
+                <button class="voice-button" onclick="startListening()">Click To Speak</button>
+
+            <!-- Below that: input + ask button -->
+            <div class="input-area">
+                <input type="text" id="text-input" placeholder="Type your message here..." />
+                <button onclick="sendText()">Ask</button>
+            </center>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -83,9 +147,18 @@
             })
             .then(response => response.json())
             .then(data => {
-                addChatEntry('Interviewer', data.reply);
+                addChatEntry('Bot', data.reply);
                 speak(data.reply);
             });
+        }
+
+        function sendText() {
+            const inputField = document.getElementById('text-input');
+            const message = inputField.value.trim();
+            if (message !== "") {
+                sendToBot(message);
+                inputField.value = "";
+            }
         }
 
         function startListening() {
@@ -125,8 +198,8 @@
         }
 
         window.onload = function() {
-            const msg = "Hello!.......👋 Welcome to our Voice Interview.";
-            addChatEntry('Interviewer', msg);
+            const msg = "Hello! I am your chatbot.";
+            addChatEntry('Bot', msg);
             speak(msg);
         };
     </script>
